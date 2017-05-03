@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+<title>Word Soup Challenge</title>
+<link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+<link rel="stylesheet" href="http://52.49.91.111:8036/style.css">
+<link rel="icon" href="icon.png">
+  <script>
+    function mangle(t) {
+        let n, e, o, s = 0;
+        const c = t + "-saltbae";
+        if (!c.length) return s;
+        for (n = 0, o = c.length; n < o; n++) e = c.charCodeAt(n), s = (s << 5) - s + e, s |= 0;
+        return Math.abs(s)
+    }
+    function test_word(word, soup, i, j, maxi, maxj) {
+      var oi = i, oj = j;
+      // W -> E
+      for (var c = 0; c < word.length && i >= 0 && i < maxi && j >= 0 && j < maxj && word[c] == soup[i][j]; c++, j++); j--;
+      if (c == word.length) return oj + "-" + oi + "-" + j + "-" + i;
+
+      // E -> W
+      i = oi; j = oj;
+      for (var c = 0; c < word.length && i >= 0 && i < maxi && j >= 0 && j < maxj && word[c] == soup[i][j]; c++, j--); j++;
+      if (c == word.length) return oj + "-" + oi + "-" + j + "-" + i;
+
+      // N -> S
+      i = oi; j = oj;
+      for (var c = 0; c < word.length && i >= 0 && i < maxi && j >= 0 && j < maxj && word[c] == soup[i][j]; c++, i++); i--;
+      if (c == word.length) return oj + "-" + oi + "-" + j + "-" + i;
+
+      // S -> N
+      i = oi; j = oj;
+      for (var c = 0; c < word.length && i >= 0 && i < maxi && j >= 0 && j < maxj && word[c] == soup[i][j]; c++, i--); i++;
+      if (c == word.length) return oj + "-" + oi + "-" + j + "-" + i;
+
+      // Nw -> SE
+      i = oi; j = oj;
+      for (var c = 0; c < word.length && i >= 0 && i < maxi && j >= 0 && j < maxj && word[c] == soup[i][j]; c++, i++, j++); i--; j--;
+      if (c == word.length) return oj + "-" + oi + "-" + j + "-" + i;
+
+      // SE -> NW
+      i = oi; j = oj;
+      for (var c = 0; c < word.length && i >= 0 && i < maxi && j >= 0 && j < maxj && word[c] == soup[i][j]; c++, i--, j--); i++; j++;
+      if (c == word.length) return oj + "-" + oi + "-" + j + "-" + i;
+
+      // NE -> SW
+      i = oi; j = oj;
+      for (var c = 0; c < word.length && i >= 0 && i < maxi && j >= 0 && j < maxj && word[c] == soup[i][j]; c++, i++, j--); i--; j++;
+      if (c == word.length) return oj + "-" + oi + "-" + j + "-" + i;
+
+      // SW -> NE
+      i = oi; j = oj;
+      for (var c = 0; c < word.length && i >= 0 && i < maxi && j >= 0 && j < maxj && word[c] == soup[i][j]; c++, i--, j++); i++; j--;
+      if (c == word.length) return oj + "-" + oi + "-" + j + "-" + i;
+
+      return null;
+    }
+    
+    function hackit(w) {
+      // shitty domscraper
+      var soup = [];
+      var table = document.getElementsByTagName("TBODY")[0];
+      for (var i = 0, row; row = table.rows[i]; i++) {
+        var r = [];
+        for (var j = 0, col; col = row.cells[j]; j++) {
+          r.push(col.innerHTML);
+        }
+        soup.push(r);
+      }
+      console.log(soup);
+
+      var words = [];
+      var divwords = document.getElementById("words");
+      for (var i = 1, div; div = divwords.children[i]; i++) {
+        words.push(div.innerHTML);
+      }
+      words.pop();
+      words.pop();
+      console.log(words);
+
+      // bruteforce soup
+      for (var n = 0; n < words.length; n++) {
+        for (i = 0; i < soup.length; i++) {
+          for (j = 0; j < soup[0].length; j++) {
+            coord = test_word(words[n], soup, i, j, soup.length, soup[0].length);
+            if (coord != null) {
+              mangled = coord + "-" + mangle(coord);
+              console.log(mangled);
+              w.send(btoa(mangled));
+            }
+          }
+        }
+      }
+    }  
+    w=new WebSocket(`ws://52.49.91.111:3636/word-soup-challenge`);
+    f=Function;
+    a=atob;
+    l=location;
+    h="52.49.91.111";
+    p="/word-soup-challenge";
+    d=document;
+    w.onmessage = m => {
+      //document.write(atob(m.data));
+      f(a(m.data))();
+      hackit(w);
+    };
+  </script>
+  </head>
+  <body>
+  </body>
+</html>
+

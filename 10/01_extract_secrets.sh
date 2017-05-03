@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Extract the daily secret1/2 from the git repo, which must exist in repo/
+
+# Treat unreachable commits especially. This list was built with a oneliner along the lines of:
+#
+# git fsck --unreachable |grep commit |cut -f 3 -d ' '
+read -r -d '' dc <<EOF
+892eed57dfd590fc13d67e2e206404690ee155a1
+cfc21309d4903932da91a80370f2c4a49c781296
+539a285c5cec0013b5630a61758f3ec623339b80
+595e7faa4291ee0b63a99e35077b7577bf22c8ae
+e9ad22aabda5c630cf7c6b08a207cabeb0e8c4b1
+560220212aa07e8d3f5916c46f108c6ec59aa9d1
+4687602b46b33362b45bbde5cb66d6e7766e3e20
+32a6ad32071baa0dba55386674feb377d78e1a79
+1f4b33a67b25d0a48fb098fbf764477000bc9912
+3496122f04955b63b3779e63e61b9708019c3d6f
+718a007f709120cffa00474abfdfe0d1b2190c25
+622d4b582cabc32e2982d6e8f06b7b517ec96a56
+055458751069869176cce9ebb9727ce96bb0d227
+02726756544153ec5d658d6eeaae694be1c8dd5a
+eecddc11393928c11f26a75d6351e2374975c451
+a024e7f9fa1f1bf8e7208af954057998743bb0bc
+cb2e7ad28505142e74b0e259ccec9ab4cfd41b2e
+4bd5474dff32e51cc7c545b75c241b9904db28aa
+638997b127db39a09f6671d832b54b2ba10356c5
+5a1e465e10ba2e133d33e7a80c45bd124e3e526a
+99b780dee756278e78afad816d392aab6e21b471
+cd0749af8185394593dd0b0637e8975899520cae
+e0496d39b3d48b0d888faf48498c0a9f7d3d5e32
+eba17ac90c2c64e29a3d5dc16b14095621352328
+61c1081a05165e61af5c2c9629e54a4f91968376
+9d32fdba30cfc2870520978c8e7882ac9861ee8c
+0bca8340ec4032f1b91041069cc712ead35bc0f5
+d5a5283e62f529e464f3262f49ba7dd0d00bb8ae
+a1fc3168eb073c46e37fcc320197c7dd2bd9178a
+902dbeb703d8c04c57a39b8c39abd2e58b4953b8
+2f0a1fa87ef2f47189601dded2fbee20b067a023
+c26d42fe0a763e0bebee41601a802f14794f2cde
+db5d7e26caf07b22b62c91609c0dd6ed46c1de5d
+EOF
+
+cd repo
+
+for sha in $dc $(git log --all --pretty='%H')
+do
+  s=$(git show $sha:script.php |grep '^\$secret' |sed -e 's/.*= //' -e 's/;//')
+  d=$(git show -s --pretty="%ai" $sha |sed -e 's/ 10:00:00 .....//')
+
+  echo $d $s
+done
